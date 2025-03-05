@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import React, { useRef } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Animated } from 'react-native';
 
 const playlists = [
     { id: '1', title: 'Top Hits' },
@@ -10,10 +10,33 @@ const playlists = [
 ];
 
 export default function HomeScreen({ navigation }) {
+    const animation = useRef(new Animated.Value(1)).current;
+
+    const handlePressIn = () => {
+        Animated.spring(animation, {
+            toValue: 0.95,
+            useNativeDriver: true,
+        }).start();
+    };
+
+    const handlePressOut = () => {
+        Animated.spring(animation, {
+            toValue: 1,
+            useNativeDriver: true,
+        }).start();
+    };
+
     const renderPlaylist = ({ item }) => (
-        <TouchableOpacity style={styles.playlistItem} onPress={() => navigation.navigate('Playlist', { playlistId: item.id })}>
-            <Text style={styles.playlistTitle}>{item.title}</Text>
-        </TouchableOpacity>
+        <Animated.View style={{ transform: [{ scale: animation }] }}>
+            <TouchableOpacity
+                style={styles.playlistItem}
+                onPressIn={handlePressIn}
+                onPressOut={handlePressOut}
+                onPress={() => navigation.navigate('Playlist', { playlistId: item.id })}
+            >
+                <Text style={styles.playlistTitle}>{item.title}</Text>
+            </TouchableOpacity>
+        </Animated.View>
     );
 
     return (
